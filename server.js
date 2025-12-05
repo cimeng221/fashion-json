@@ -116,8 +116,8 @@ app.post("/auth/login", async (req, res, next) => {
 app.get("/fashion", async (req, res) => {
   try {
     const result = await db.query(
-      // UBAH: "productName" -> productname
-      `SELECT sku, productname, price, "isAvailable" FROM fashion ORDER BY sku ASC`
+      // Diubah: "productName" -> productname; "isAvailable" -> isavailable
+      `SELECT sku, productname, price, isavailable FROM fashion ORDER BY sku ASC`
     );
 
     res.json(result.rows);
@@ -132,8 +132,8 @@ app.get("/fashion/:sku", async (req, res) => {
 
   try {
     const result = await db.query(
-      // UBAH: "productName" -> productname
-      `SELECT sku, productname, price, "isAvailable" FROM fashion WHERE sku = $1`,
+      // Diubah: "productName" -> productname; "isAvailable" -> isavailable
+      `SELECT sku, productname, price, isavailable FROM fashion WHERE sku = $1`,
       [sku]
     );
 
@@ -156,8 +156,8 @@ app.post("/fashion", authenticateToken, authorizeRole("admin"), async (req, res)
 
   try {
     const result = await db.query(
-      // UBAH: "productName" -> productname (di bagian INSERT)
-      `INSERT INTO fashion (sku, productname, price, "isAvailable") 
+      // Diubah: "productName" -> productname; "isAvailable" -> isavailable
+      `INSERT INTO fashion (sku, productname, price, isavailable)
        VALUES ($1, $2, $3, $4)
        RETURNING *`,
       [sku, productName, price, isAvailable]
@@ -192,7 +192,7 @@ app.put("/fashion/:sku", authenticateToken, authorizeRole("admin"), async (req, 
 
     const result = await db.query(
       `UPDATE fashion
-       SET productname = $1, price = $2, "isAvailable" = $3 // UBAH: "productName" -> productname
+       SET productname = $1, price = $2, isavailable = $3 // Diubah: "isAvailable" -> isavailable
        WHERE sku = $4
        RETURNING *`,
       [productName, price, isAvailable, sku]
@@ -236,10 +236,8 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: err.message });
 });
 
-// Hapus atau komentari app.listen() ini saat deploy ke Vercel untuk hasil terbaik
+// Ekspor app untuk lingkungan serverless Vercel
+module.exports = app;
 // app.listen(PORT, "0.0.0.0", () => {
 //   console.log(`Server berjalan di http://localhost:${PORT}`);
 // });
-
-// Ekspor app untuk lingkungan serverless Vercel
-module.exports = app;
